@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 const controleMecaniqueSchema = mongoose.Schema({
-    VoitureId: { type : mongoose.Schema.Types.ObjectId, ref: "Voiture", required : false},
-    Pneumatique: {
-        PAVG : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
+    voitureId: { type : mongoose.Schema.Types.ObjectId, ref: "Voiture", required : false},
+    pneumatique: {
+        pAVG : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
         PAVD : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
-        PARG : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
-        PARD : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
+        pARG : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
+        pARD : { Marque: {type: String}, Dimensions: {type: String}, ProfondeurRestante: {type: String}, TypePneu: {type: Date}},
     },
-    Freinage: {
+    freinage: {
         plaquetteAV: { type: String},
         plaquetteAR: { type: String},
-        DisqueAV: { type: String},
-        DisqueAR: { type: String},
+        disqueAV: { type: String},
+        disqueAR: { type: String},
     },
     Distribution: {TypeDisribution: { type: String}},
     Moteur: {
