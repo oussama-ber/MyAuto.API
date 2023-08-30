@@ -15,6 +15,7 @@ mongoose
   });
 
 const carRoutes = require("./routes/carRoute");
+const requestRoutes = require("./routes/requestRoute");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,5 +33,6 @@ app.use((req, res, next) => {
     next();
   });
 app.use("/api/car",carRoutes);
+app.use("/api/request",requestRoutes);
 
   module.exports = app;
