@@ -22,37 +22,18 @@ exports.getCars = (req, res, next) => {
 exports.getFilteredCars = (req, res, next) => {
    const prixMax = req.body.prixMax;
    const prixMin = req.body.prixMin;
-   const marqueFilter = req.body.marque;
-   const modeleFilter = req.body.modele;
+   let marqueFilter = req.body.marque;
+   let modeleFilter = req.body.modele;
    const kilometrageMin = req.body.kilometrageMin;
    const kilometrageMax = req.body.kilometrageMax;
    const dateMin = req.body.dateMin;
    const dateMax = req.body.dateMax;
-   const carburant = req.body.carburant;
-   const boiteVitesse = req.body.boiteVitesse;
-
+   let carburant = req.body.carburant;
+   let boiteVitesse = req.body.boiteVitesse;
    const marqueRegexArray = marqueFilter.map(marque => new RegExp(marque, 'i'));
    const modeleRegexArray = modeleFilter.map(modele => new RegExp(modele, 'i'));
    const carburantRegexArray = carburant.map(carbur => new RegExp(carbur, 'i'));
    const boiteVitesseRegexArray = boiteVitesse.map(boiteV => new RegExp(boiteV, 'i'));
-
-//   const carQuery = VoitureModel.find({ 
-//     prix: { $gt: prixMin },
-//     prix: { $lte: prixMax }, 
-//     kilometrage: { $gt: kilometrageMin },
-//     kilometrage: { $lte: kilometrageMax }, 
-//     marque: { $in: marqueRegexArray }, 
-//     marque: { $in: marqueRegexArray }, 
-//     modele: { $in: modeleRegexArray }, 
-//     carburant: { $in: carburantRegexArray }, 
-//     boiteVitesse: { $in: boiteVitesseRegexArray }, 
-//     $expr: {
-//         $and: [
-//           { $gte: [{ $year: '$createdDate' }, dateMin] },
-//           { $lte: [{ $year: '$createdDate' }, dateMax] }
-//         ]
-//       }
-// })
 const carQuery = VoitureModel.find();
 if (prixMin > 0) {
     carQuery.where('prix').gt(prixMin);
