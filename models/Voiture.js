@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ControleMecaniqueModel = require("./ControleMecanique");
 
 const voitureSchema = mongoose.Schema({
     prix: { type: Number},
@@ -10,8 +11,9 @@ const voitureSchema = mongoose.Schema({
     kilometrage:{type: Number},
     options:[{type: String}],
     entretienHistory: [{ type : mongoose.Schema.Types.ObjectId, ref: "Entretien", required : false}],
-    etatExterieur:[ { EXTitre:{type: String}, EXDescription: {type: String} } ],
-    etatInterieur:[ { EITitre:{type: String}, EIDescription: {type: String} } ],
+    etatExterieur:[ { eXTitre:{type: String}, EXDescription: {type: String} } ],
+    etatInterieur:[ { eITitre:{type: String}, EIDescription: {type: String} } ],
+    controleMecanique: {type: mongoose.Schema.Types.ObjectId, ref: "ControleMecanique", required : false},
     tag:{type: String},
     createdDate: {type: Date}
 });
