@@ -122,7 +122,7 @@ exports.getCarDetailsById = async (req, res, next) => {
                 message: "Car details fetched successfully!",
                 historyDetails: resultentretien,
                 car: carQuery,
-            });
+            }); 
         }).catch((error)=>{
             res.status(500).json({
                 error: error,
