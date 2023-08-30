@@ -1,5 +1,6 @@
 const VoitureModel = require("../models/Voiture");
 const EntretienModel = require("../models/Entretien");
+const ControleMecaniqueModel = require("../models/ControleMecanique");
 
 exports.getCars = (req, res, next) => {
   const carQuery = VoitureModel.find();
@@ -113,15 +114,18 @@ exports.getLatestCars = (req, res, next) => {
     });
 }
 exports.getCarDetailsById = async (req, res, next) => {
-    const vId = req.body.voitureId
-    const carQuery = await VoitureModel.findOne({_id: vId });
+    const carId = req.query.voitureId
+    const carQuery = await VoitureModel.findOne({_id: carId });
+
     if(carQuery){
+        const cm = await ControleMecaniqueModel.findOne({voitureId: carQuery._id}).catch((error) => {cm = new ControleMecaniqueModel({})});
         const entretienQuery = await EntretienModel.find({VoitureId: carQuery._id})
         .then((resultentretien)=>{
             res.status(200).json({
                 message: "Car details fetched successfully!",
-                historyDetails: resultentretien,
                 car: carQuery,
+                historyDetails: resultentretien,
+                cm: cm
             }); 
         }).catch((error)=>{
             res.status(500).json({
