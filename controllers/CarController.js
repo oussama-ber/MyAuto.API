@@ -188,6 +188,23 @@ exports.UpdateCarDate = async (req, res, next) => {
             });
           });   
 }
+exports.deleteCarById =  async (req, res, next) => {
+  const carId = req.body.carId;
+    VoitureModel.deleteOne({ _id: carId })
+      .then((result) => {
+        if (result.deletedCount > 0) {
+          res.status(200).json({ message: "Deletion successful!" });
+        } else {
+          res.status(401).json({ message: "Nothing deleted !" });
+        }
+      })
+      .catch((error) => {
+        res.status(500).json({
+          error: error,
+          message: "Fetching events failed!",
+        });
+      });
+}
 //get filters
 exports.getFilters = async (req, res, next) => {
   try {
