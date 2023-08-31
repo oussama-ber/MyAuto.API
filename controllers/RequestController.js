@@ -112,32 +112,31 @@ exports.acceptRequest =  async (req, res, next) => {
   
     RequestModel.updateOne({ _id: req.body._id}, requestToUpdate)
         .then(async (result) => {
-            console.log("result", result);
           if (result.modifiedCount > 0) {
-            //   #region mail  
-            //   let config = {
-            //       service: 'gmail',
-            //       auth: {
-            //           user: process.env.EMAIL,
-            //           pass: process.env.PASSWORD
-            //       }
-            //   }
-            // var transporter = nodemailer.createTransport(config);
-            // const info = await transporter.sendMail({
-            //     from: 'myauto.noreply@gmail.com', 
-            //     to: requestToUpdate.email, 
-            //     subject: "Request accepted", 
-            //     text: `Dear Client,\n Your request has been accepted successfully, request created at ${requestToSave.createdDate}.\n
-            //     you will hear from us soon.
-            //      Please contact our support team for further details. \n \n Best Regards, \n \n MyAuto support Team.`,
-            //   })
-            //   .then((result)=>{
+              // #region mail  
+              let config = {
+                  service: 'gmail',
+                  auth: {
+                      user: process.env.EMAIL,
+                      pass: process.env.PASSWORD
+                  }
+              }
+            var transporter = nodemailer.createTransport(config);
+            const info = await transporter.sendMail({
+                from: 'myauto.noreply@gmail.com', 
+                to: requestToUpdate.email, 
+                subject: "Request accepted", 
+                text: `Dear Client,\n Your request has been accepted successfully, request created at ${requestToSave.createdDate}.\n
+                you will hear from us soon.
+                 Please contact our support team for further details. \n \n Best Regards, \n \n MyAuto support Team.`,
+              })
+              .then((result)=>{
                 
-            //     })
-            //   .catch((error)=>{
-            //       res.status(500).json({ error: error});
+                })
+              .catch((error)=>{
+                  res.status(500).json({ error: error});
     
-            //   })
+              })
             // #endregion mail
             res.status(200).json({ message: "request accepted successful!" });
           } else {
