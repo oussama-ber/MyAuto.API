@@ -2,12 +2,12 @@ const ImageModel = require("../models/TestImage");
 exports.saveImage =  async (req, res, next) => {
     try {
         const ImageToSave = new ImageModel({
-            fileBase64: req.body.fileBase64,
+            fileURL: req.body.imageUrl,
+            voitureId: req.body.carId,
         });
-        ImageToSave.save();
-        console.log("first")
+        const savedImage = await ImageToSave.save();
         res.status(201).json({
-            createdImage: fileBase64,
+            createdImage: savedImage,
             message: "image created successfully"
         });
     } catch (error) {

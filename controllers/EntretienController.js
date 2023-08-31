@@ -4,7 +4,6 @@ exports.getEntretien = async (req, res, next) => {
     const vID =  req.body.vid
     try {
         const entretienQuery = await EntretienModel.find({VoitureId: vID});
-        console.log(entretienQuery);
         if (!entretienQuery) {
         res.status(400).send("Entretien not found");
         } else {
@@ -36,7 +35,6 @@ exports.saveEntretien = (req, res, next) => {
           });
         })
         .catch((error) => {
-            console.log("error", error)
           res.status(500).json({
             error: error,
             message: "Creating an Entretien failed!",

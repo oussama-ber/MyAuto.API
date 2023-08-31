@@ -12,6 +12,7 @@ router.post("/saveCar",carController.SaveCar);
 router.get("/getCarDetailsById",carController.getCarDetailsById);
 router.post("/updateCarDate",carController.UpdateCarDate);
 router.post("/deleteCarById",carController.deleteCarById);
+router.post("/saveOffreVoiture",carController.saveOffreVoiture);
 // entretien
 router.post("/getEntretiensByCarId",entretienController.getEntretien);
 router.post("/saveEntretien",entretienController.saveEntretien);
