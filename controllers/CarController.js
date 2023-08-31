@@ -117,15 +117,17 @@ exports.getCarDetailsById = async (req, res, next) => {
     const carId = req.query.voitureId
     const carQuery = await VoitureModel.findOne({_id: carId });
 
+    
     if(carQuery){
         const cm = await ControleMecaniqueModel.findOne({voitureId: carQuery._id}).catch((error) => {cm = new ControleMecaniqueModel({})});
         const entretienQuery = await EntretienModel.find({VoitureId: carQuery._id})
         .then((resultentretien)=>{
+            resultentretien = resultentretien.sort((x,y) => {return x.Kilometrage - y.Kilometrage})
             res.status(200).json({
                 message: "Car details fetched successfully!",
                 car: carQuery,
                 historyDetails: resultentretien,
-                cm: cm
+                controleMecanique: cm
             }); 
         }).catch((error)=>{
             res.status(500).json({
