@@ -11,8 +11,8 @@ const voitureSchema = mongoose.Schema({
     kilometrage:{type: Number},
     options:[{type: String}],
     entretienHistory: [{ type : mongoose.Schema.Types.ObjectId, ref: "Entretien", required : false}],
-    etatExterieur:[ { eXTitre:{type: String}, EXDescription: {type: String} } ],
-    etatInterieur:[ { eITitre:{type: String}, EIDescription: {type: String} } ],
+    etatExterieur:[ { exTitre:{type: String}, exDescription: {type: String} } ],
+    etatInterieur:[ { eiTitre:{type: String}, eiDescription: {type: String} } ],
     controleMecanique: {type: mongoose.Schema.Types.ObjectId, ref: "ControleMecanique", required : false},
     tag:{type: String},
     createdDate: {type: Date}
