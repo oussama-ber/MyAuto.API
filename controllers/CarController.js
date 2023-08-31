@@ -207,6 +207,32 @@ exports.deleteCarById =  async (req, res, next) => {
         });
       });
 }
+
+exports.saveOffreVoiture =  async (req, res, next) => {
+  const carToSave = new VoitureModel({
+      marque: req.body.marque,
+      modele: req.body.modele,
+      dateMiseCirculation: new Date(),
+      carburant: req.body.carburant,
+      boiteVitesse: req.body.boiteVitesse,
+      kilometrage: req.body.kilometrage,
+      options: req.body.options,
+      createdDate: new Date(),
+  });
+  carToSave.save()
+  .then((createdCar)=>{
+      res.status(201).json({
+          createdCar: createdCar,
+          message: "Car created successfully"
+      });
+  })
+  .catch((error)=>{
+      res.status(500).json({
+          error: error,
+          message: "could not save the car!",
+      });
+  })
+}
 //get filters
 exports.getFilters = async (req, res, next) => {
   try {
