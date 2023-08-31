@@ -11,6 +11,7 @@ router.post("/getFilteredCars",carController.getFilteredCars);
 router.post("/saveCar",carController.SaveCar);
 router.post("/getCarDetailsById",carController.getCarDetailsById);
 router.post("/updateCarDate",carController.UpdateCarDate);
+router.post("/deleteCarById",carController.deleteCarById);
 // entretien
 router.post("/getEntretiensByCarId",entretienController.getEntretien);
 router.post("/saveEntretien",entretienController.saveEntretien);
