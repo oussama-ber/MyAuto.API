@@ -2,6 +2,7 @@ const VoitureModel = require("../models/Voiture");
 const EntretienModel = require("../models/Entretien");
 const ControleMecaniqueModel = require("../models/ControleMecanique");
 const ImageModel = require("../models/TestImage");
+
 exports.getCars = (req, res, next) => {
   
   const carQuery = VoitureModel.find()
@@ -153,16 +154,20 @@ exports.getCarDetailsById = async (req, res, next) => {
     
     if(carQuery){
         const cm = await ControleMecaniqueModel.findOne({voitureId: carQuery._id}).catch((error) => {cm = new ControleMecaniqueModel({})});
-        const entretienQuery = await EntretienModel.find({VoitureId: carQuery._id})
+        const entretienQuery = await EntretienModel.find({voitureId: carQuery._id})
         .then(async (resultentretien)=>{
-            resultentretien = resultentretien.sort((x,y) => {return y.Kilometrage - x.Kilometrage})
-            const currentCarImages = await ImageModel.find({voitureId : carQuery._id})
+            resultentretien = resultentretien.sort((x,y) => {return y.kilometrage - x.kilometrage})
+            const currentCarImages = await ImageModel.find({voitureId : carQuery._id});
+            const currentCarEntretien = await EntretienModel.find({voitureId : carQuery._id});
+            
             res.status(200).json({
                 message: "Car details fetched successfully!",
                 car: carQuery,
                 historyDetails: resultentretien,
                 controleMecanique: cm,
                 images: currentCarImages,
+                entretienHistory: currentCarEntretien,
+
             }); 
         }).catch((error)=>{
             res.status(500).json({
@@ -244,113 +249,142 @@ exports.deleteCarById =  async (req, res, next) => {
 }
 
 exports.saveOffreVoiture =  async (req, res, next) => {
-  var etatExterieurArray = []; 
-  for (let index = 0; index < req.body.etatExterieur.length; index++) {
-    etatExterieurArray.push(
-      {
-        exTitre: req.body.etatInterieur[index],
-        exDescription: ""
-      });
-  }
-  var etatInterieurArray= []; 
-  for (let index = 0; index < req.body.etatInterieur.length; index++) {
-    etatInterieurArray.push(
-      {
-        eiTitre: req.body.etatInterieur[index],
-        eiDescription: ""
-      });
-  }
-  const carToSave = new VoitureModel({
-      marque: req.body.marque,
-      modele: req.body.modele,
-      dateMiseCirculation: new Date(),
-      carburant: req.body.carburant,
-      boiteVitesse: req.body.boiteVitesse,
-      kilometrage: req.body.kilometrage,
-      options: req.body.options,
-      etatExterieur: etatExterieurArray,
-      etatInterieur: etatInterieurArray,
-      createdDate: new Date(),
-      prix: req.body.prix,
-      tag: ''
-  });
-  carToSave.save()
-  .then((createdCar)=>{
-    const createdCarId = createdCar._id;
-    const controleMecanique = new ControleMecaniqueModel({
-    voitureId : createdCarId,
-    pneumatique: {
-      pAVG : { 
-        marque: req.body.pneumatiques.avg.aVGmarque, 
-        dimensions: req.body.pneumatiques.avg.aVGdimensions, 
-        profondeurRestante: req.body.pneumatiques.avg.aVGprofondeurRestante, 
-        typePneu: req.body.pneumatiques.avg.aVGtypePneu
-      },
-      pAVD : { 
-        marque: req.body.pneumatiques.avd.aVDmarque, 
-        dimensions: req.body.pneumatiques.avd.aVDdimensions,
-        profondeurRestante: req.body.pneumatiques.avd.aVDprofondeurRestante,
-        typePneu: req.body.pneumatiques.avd.aVDtypePneu,
-      },
-      pARG : { 
-        marque: req.body.pneumatiques.arg.aRGmarque, 
-        dimensions: req.body.pneumatiques.arg.aRGdimensions, 
-        profondeurRestante: req.body.pneumatiques.arg.aRGprofondeurRestante, 
-        typePneu: req.body.pneumatiques.arg.aRGtypePneu, 
-      },
-      pARD : { 
-        marque: req.body.pneumatiques.ard.aRDmarque, 
-        dimensions: req.body.pneumatiques.ard.aRDdimensions, 
-        profondeurRestante: req.body.pneumatiques.ard.aRDprofondeurRestante, 
-        typePneu: req.body.pneumatiques.ard.aRDtypePneu, 
-      },
-    },
-    freinage: {
-      plaquetteAV: req.body.freinage.AvPlaque,
-      plaquetteAR: req.body.freinage.aRplaque,
-      disqueAV: req.body.freinage.aVdisque,
-      disqueAR: req.body.freinage.aRdisque,
-    },
-    distribution : req.body.distributionType,
-    moteur: {
-      niveauHuile: req.body.moteur.moteurNiveauHuile,
-      niveauLiquideFrein: req.body.moteur.moteurNiveauLiquideFrein,
-      niveauLiquideRefroidissement: req.body.moteur.moteurNiveauRefroidissement,
-      examenVisuelFuitesHuile: req.body.moteur.examenVisuelFruitesHuile,
-      courroieDaccessoire: req.body.moteur.courroieAccessoire,
-      etatBatterieLinspection: req.body.moteur.etatBatterie,
-    },
-    chassis: {
-      trainAvant: { 
-        rotules: req.body.chassis.trainAvRotules,
-        cardans : req.body.chassis.trainAVCardans,
-        amortisseurs : req.body.chassis.trainAVAmortisseurs,
-      },
-      trainArriere: { 
-        rotules: req.body.chassis.trainARRotules,
-        cardans : req.body.chassis.trainARCardans,
-        amortisseurs : req.body.chassis.trainARAmortisseurs,
-      }
-    },
-    testConduite : {
-      resultat: req.body.testConduite.resultatFinal,
-      vitesseMax: req.body.testConduite.vitesseMax,
+  try {
+    var etatExterieurArray = []; 
+    for (let index = 0; index < req.body.etatExterieur.length; index++) {
+      etatExterieurArray.push(
+        {
+          exTitre: req.body.etatInterieur[index],
+          exDescription: ""
+        });
     }
+    var etatInterieurArray= []; 
+    for (let index = 0; index < req.body.etatInterieur.length; index++) {
+      etatInterieurArray.push(
+        {
+          eiTitre: req.body.etatInterieur[index],
+          eiDescription: ""
+        });
+    }
+   
+    console.log("req.body.prix", req.body.prix)
+    const carToSave = new VoitureModel({
+        marque: req.body.marque,
+        modele: req.body.modele,
+        dateMiseCirculation: new Date(),
+        carburant: req.body.carburant,
+        boiteVitesse: req.body.boiteVitesse,
+        kilometrage: req.body.kilometrage,
+        options: req.body.options,
+        etatExterieur: etatExterieurArray,
+        etatInterieur: etatInterieurArray,
+        createdDate: new Date(),
+        prix: req.body.prix,
+        tag: ''
     });
-    controleMecanique.save().then((resres)=>{
-    }).catch((er)=>{
+    carToSave.save()
+    .then((createdCar)=>{
+      const createdCarId = createdCar._id;
+      const controleMecanique = new ControleMecaniqueModel({
+      voitureId : createdCarId,
+      pneumatique: {
+        pAVG : { 
+          marque: req.body.pneumatiques.avg.aVGmarque, 
+          dimensions: req.body.pneumatiques.avg.aVGdimensions, 
+          profondeurRestante: req.body.pneumatiques.avg.aVGprofondeurRestante, 
+          typePneu: req.body.pneumatiques.avg.aVGtypePneu
+        },
+        pAVD : { 
+          marque: req.body.pneumatiques.avd.aVDmarque, 
+          dimensions: req.body.pneumatiques.avd.aVDdimensions,
+          profondeurRestante: req.body.pneumatiques.avd.aVDprofondeurRestante,
+          typePneu: req.body.pneumatiques.avd.aVDtypePneu,
+        },
+        pARG : { 
+          marque: req.body.pneumatiques.arg.aRGmarque, 
+          dimensions: req.body.pneumatiques.arg.aRGdimensions, 
+          profondeurRestante: req.body.pneumatiques.arg.aRGprofondeurRestante, 
+          typePneu: req.body.pneumatiques.arg.aRGtypePneu, 
+        },
+        pARD : { 
+          marque: req.body.pneumatiques.ard.aRDmarque, 
+          dimensions: req.body.pneumatiques.ard.aRDdimensions, 
+          profondeurRestante: req.body.pneumatiques.ard.aRDprofondeurRestante, 
+          typePneu: req.body.pneumatiques.ard.aRDtypePneu, 
+        },
+      },
+      freinage: {
+        plaquetteAV: req.body.freinage.AvPlaque,
+        plaquetteAR: req.body.freinage.aRplaque,
+        disqueAV: req.body.freinage.aVdisque,
+        disqueAR: req.body.freinage.aRdisque,
+      },
+      distribution : req.body.distributionType,
+      moteur: {
+        niveauHuile: req.body.moteur.moteurNiveauHuile,
+        niveauLiquideFrein: req.body.moteur.moteurNiveauLiquideFrein,
+        niveauLiquideRefroidissement: req.body.moteur.moteurNiveauRefroidissement,
+        examenVisuelFuitesHuile: req.body.moteur.examenVisuelFruitesHuile,
+        courroieDaccessoire: req.body.moteur.courroieAccessoire,
+        etatBatterieLinspection: req.body.moteur.etatBatterie,
+      },
+      chassis: {
+        trainAvant: { 
+          rotules: req.body.chassis.trainAvRotules,
+          cardans : req.body.chassis.trainAVCardans,
+          amortisseurs : req.body.chassis.trainAVAmortisseurs,
+        },
+        trainArriere: { 
+          rotules: req.body.chassis.trainARRotules,
+          cardans : req.body.chassis.trainARCardans,
+          amortisseurs : req.body.chassis.trainARAmortisseurs,
+        }
+      },
+      testConduite : {
+        resultat: req.body.testConduite.resultatFinal,
+        vitesseMax: req.body.testConduite.vitesseMax,
+      }
+      });
+      
+      var entretienHistoryy = []; 
+      for (let index = 0; index < req.body.entretienHistory.length; index++) {
+        entretienHistoryy.push(
+          {
+            voitureId: createdCar._id,
+            kilometrage: req.body.entretienHistory[index].kilometrage,
+            description: req.body.entretienHistory[index].description,
+            date: req.body.entretienHistory[index].date
+          });
+        } 
+      console.log("entretienHistoryy", entretienHistoryy)
+      EntretienModel.insertMany(entretienHistoryy)
+      .then((createdEntretiens)=>{
+        console.log("createdEntretiens", createdEntretiens)
+      })
+      .catch((entretienError)=>{
+        console.log("error",entretienError)
+      })
+  
+      controleMecanique.save().then((resres)=>{
+      }).catch((er)=>{
+        console.log("er", er)
+      })
+  
+  
+        res.status(201).json({
+            createdCar: createdCar,
+            message: "Car created successfully"
+        });
     })
-      res.status(201).json({
-          createdCar: createdCar,
-          message: "Car created successfully"
-      });
-  })
-  .catch((error)=>{
-      res.status(500).json({
-          error: error,
-          message: "could not save the car!",
-      });
-  })
+    .catch((error)=>{
+        res.status(500).json({
+            error: error,
+            message: "could not save the car!",
+        });
+    })
+  } catch (error) {
+    console.log("error", error)
+  }
 }
 //get filters
 exports.getFilters = async (req, res, next) => {
