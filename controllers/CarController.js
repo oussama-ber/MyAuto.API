@@ -254,7 +254,7 @@ exports.saveOffreVoiture =  async (req, res, next) => {
     for (let index = 0; index < req.body.etatExterieur.length; index++) {
       etatExterieurArray.push(
         {
-          exTitre: req.body.etatInterieur[index],
+          exTitre: req.body.etatExterieur[index],
           exDescription: ""
         });
     }
